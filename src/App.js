@@ -1,24 +1,32 @@
 import logo from './logo.svg';
 import './App.css';
+import AddPost from './Pages/AddPost/AddPost';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Route, Routes } from 'react-router-dom';
+import NavBar from './Pages/Shared/NavBar';
+import Home from './Pages/Home/Home';
+import Login from './Pages/Login/Login';
+import Signup from './Pages/Login/Signup';
+import Footer from './Pages/Shared/Footer';
+import { useState, createContext } from 'react';
+
+export const UserContext = createContext(); 
 
 function App() {
+  const [loggedInUser , setLoggedInUser]  = useState({})
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <UserContext.Provider value={[loggedInUser , setLoggedInUser]}>
+      <NavBar></NavBar>
+      <Routes>
+        <Route path = "/" element = {<Home></Home>}></Route>
+        <Route path = "/login" element = {<Login></Login>}></Route>
+        <Route path = "/signup" element = {<Signup></Signup>}></Route>
+        <Route path='/addPost' element={<AddPost></AddPost>}></Route>
+      </Routes>
+      <Footer></Footer>
+      <ToastContainer />
+    </UserContext.Provider>
   );
 }
 
