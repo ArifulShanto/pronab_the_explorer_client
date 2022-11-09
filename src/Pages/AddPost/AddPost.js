@@ -1,18 +1,27 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useContext }  from 'react';
+import { format } from 'date-fns';
 import { Editor } from '@tinymce/tinymce-react';
 import parse from 'html-react-parser';
 import './AddPost.css';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { UserContext } from '../../App';
+import { useNavigate } from 'react-router-dom';
 
 
 
 
-export default function App() {
+const AddPost = () => {
+    const [loggedInUser, setLoggedInUser] = useContext(UserContext);
+    const [date, setDate] = useState(new Date());
     const [name, setName] = useState('');
     const [postDetails, setPostDetails] = useState('');
-    const [thumbnailImage, setThumbnailImage] = useState({preview : '' , data : ''});
+    const [thumbnailImage, setThumbnailImage] = useState({ preview: '', data: '' });
+    const [thumbnailImageDestination, setThumbnailImageDestination] = useState('');
     const editorRef = useRef(null);
+
+    const formattedDate = format(date, 'PP');
+    const navigate = useNavigate();
 
 
 
@@ -37,11 +46,12 @@ export default function App() {
             axios.post('http://localhost:5000/thumbnailImage', formData)
                 .then(function (response) {
                     console.log(response);
+                    setThumbnailImageDestination(response.data);
+                    toast.success('Thumbnail Image Uploaded Successfully');
                 })
                 .catch(function (error) {
                     console.log(error);
                 });
-            console.log(thumbnailImage);
             
         }
     }
@@ -53,12 +63,20 @@ export default function App() {
             const content = editorRef.current.getContent();
             console.log(content);
             if (content === "") {
+                console.log(thumbnailImageDestination);
                 e.preventDefault();
                 toast.error('Something Went Wrong');
             }
+            else if(!thumbnailImageDestination){
+                toast.error('Please Upload Your Thumbnail Image');
+            }
             else {
                 const currentPost = {
+                    name : loggedInUser.name,
                     postName: name,
+                    date : formattedDate, 
+                    thumbnailImage: thumbnailImageDestination,
+                    postDetails: postDetails,
                     content: content
                 }
                 axios.post('http://localhost:5000/addPost', currentPost)
@@ -68,6 +86,8 @@ export default function App() {
                     .catch(function (error) {
                         console.log(error);
                     });
+                navigate('/posts');
+                
             }
 
         }
@@ -98,7 +118,7 @@ export default function App() {
                                 setPostDetails(event.target.value);
                             }} required type="text" placeholder="Enter your post description" className="input input-bordered w-full h-20 max-w-xs " />
                         </div>
-                        <label className='text-center m-auto' htmlFor="">Enter your post content here</label>
+                        <label htmlFor="">Enter your post content here</label>
                         <div>
                             <Editor
                                 apiKey='qwsfhyvb3ckncskkclp530zzmw0lyhtcwujjm876aww7y2wi'
@@ -111,14 +131,15 @@ export default function App() {
                                     plugins: [
                                         'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                                         'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                                        'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount', 'image', 'save'
+                                        'insertdatetime', 'table', 'media' , 'code', 'help', 'wordcount', 'image', 'save'
                                     ],
                                     toolbar: 'undo redo | blocks | ' +
                                         'bold italic forecolor | alignleft aligncenter ' +
                                         'alignright alignjustify | bullist numlist outdent indent | ' +
-                                        'removeformat | image' + '| table |',
+                                        'removeformat | image ' + 'media' + '| table |',
                                     content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
-                                    name : 'tiny-mce',
+                                    name: 'tiny-mce',
+                                    media_live_embeds: true,
                                     automatic_uploads: true,
                                     images_upload_url: '/postImage',
 
@@ -135,3 +156,5 @@ export default function App() {
 
     );
 }
+
+export default AddPost;

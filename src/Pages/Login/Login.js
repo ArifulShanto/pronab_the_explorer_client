@@ -1,13 +1,20 @@
 import axios from 'axios';
 import React , {useContext} from 'react';
 import { useForm } from "react-hook-form";
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { UserContext } from '../../App';
 
 const Login = () => {
     const [loggedInUser, setLoggedInUser] = useContext(UserContext);
-    const { register, formState: { errors }, handleSubmit, getValues , resetField } = useForm();
+    const { register, formState: { errors }, handleSubmit, getValues, resetField } = useForm();
+    
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    let from = location.state?.from?.pathname || '/';
+
+
     const onSubmit = data => {
         if (data.email && data.password)  {
             const exUser = {
@@ -23,6 +30,7 @@ const Login = () => {
                         toast('Successfully Logged In');
                         const user = { ...exUser, name: response.data.name };
                         setLoggedInUser(user);
+                        navigate(from, { replace: true });
                     }
                 })
                 .catch(function (error) {

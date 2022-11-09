@@ -1,15 +1,18 @@
-import React from 'react';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import React, { useContext } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { UserContext } from '../../App';
 
 const RequireAuth = ({ children }) => {
+    const [loggedInUser, setLoggedInUser] = useContext(UserContext);
     
     const location = useLocation();
+
     
+    if (!loggedInUser.email) {
+        return <Navigate to="/login" state={{ from: location }} replace></Navigate>
+    }
+
     
-    // if (!user) {
-    //     return <Navigate to  = "/login" state = {{from : location}} replace></Navigate>
-    // }
 
     return children;
 };

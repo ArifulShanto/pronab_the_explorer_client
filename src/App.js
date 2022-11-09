@@ -10,6 +10,9 @@ import Login from './Pages/Login/Login';
 import Signup from './Pages/Login/Signup';
 import Footer from './Pages/Shared/Footer';
 import { useState, createContext } from 'react';
+import RequireAuth from './Pages/Login/RequireAuth';
+import Posts from './Pages/Posts/Posts';
+import SinglePost from './Pages/Posts/SinglePost';
 
 export const UserContext = createContext(); 
 
@@ -22,7 +25,9 @@ function App() {
         <Route path = "/" element = {<Home></Home>}></Route>
         <Route path = "/login" element = {<Login></Login>}></Route>
         <Route path = "/signup" element = {<Signup></Signup>}></Route>
-        <Route path='/addPost' element={<AddPost></AddPost>}></Route>
+        <Route path='/addPost' element={<RequireAuth><AddPost></AddPost></RequireAuth>}></Route>
+        <Route path='/posts' element={<RequireAuth><Posts></Posts></RequireAuth>}></Route>
+        <Route path='/posts/:postId' element = {<RequireAuth><SinglePost></SinglePost></RequireAuth>}></Route>
       </Routes>
       <Footer></Footer>
       <ToastContainer />
